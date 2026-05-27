@@ -44,17 +44,21 @@ class ExtractionAgent:
         )
 
         system_prompt = (
-            "You are an expert contract parser. Your task is to extract the exact list of modified/added/deleted "
-            "clauses, the main topics touched by the amendment, and a detailed summary of the changes.\n"
-            "Rely on the provided Original Contract, Amendment, and the Contextual Alignment Map.\n"
-            "You must strictly adhere to the requested schema output."
+            "Eres un experto en análisis de contratos legales. Tu tarea es extraer la lista exacta de "
+            "cláusulas modificadas, agregadas o eliminadas, los temas legales/comerciales afectados y un "
+            "resumen detallado de los cambios.\n"
+            "Utiliza el Contrato Original, la Enmienda y el Mapa de Alineación Contextual proporcionados.\n"
+            "Debes cumplir estrictamente con el esquema de salida solicitado.\n"
+            "IMPORTANTE: Responde SIEMPRE en español. Todos los valores de texto del JSON "
+            "(sections_changed, topics_touched, summary_of_the_change) deben estar redactados en español, "
+            "incluso si el contrato fuente contiene términos en otro idioma."
         )
 
         user_content = (
-            f"### ORIGINAL CONTRACT:\n{original_text}\n\n"
-            f"### AMENDMENT CONTRACT:\n{amendment_text}\n\n"
-            f"### CONTEXTUAL ALIGNMENT MAP:\n{alignment_map}\n\n"
-            "Please extract the changes according to the specified schema."
+            f"### CONTRATO ORIGINAL:\n{original_text}\n\n"
+            f"### ENMIENDA:\n{amendment_text}\n\n"
+            f"### MAPA DE ALINEACIÓN CONTEXTUAL:\n{alignment_map}\n\n"
+            "Extrae los cambios según el esquema indicado. Redacta toda la salida en español."
         )
 
         messages = [

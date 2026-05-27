@@ -1,0 +1,17 @@
+[
+  {
+    "id": "documento_1",
+    "duration_seconds": 19.2,
+    "output_file": "data\\e2e_results\\documento_1.json"
+  },
+  {
+    "id": "documento_2",
+    "duration_seconds": 15.0,
+    "output_file": "data\\e2e_results\\documento_2.json"
+  },
+  {
+    "id": "documento_3",
+    "duration_seconds": 11.6,
+    "output_file": "data\\e2e_results\\documento_3.json"
+  }
+]
