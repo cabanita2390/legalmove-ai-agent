@@ -73,7 +73,6 @@ Las llamadas a OpenAI se registran como generaciones anidadas (tokens, latencia,
 │   ├── models.py
 │   └── main.py
 ├── run_e2e.py                 # Suite E2E sobre los 3 pares de prueba
-├── verify_pipeline.py         # Test de orquestación con mocks
 ├── .env.example
 ├── requirements.txt
 └── README.md
@@ -139,12 +138,6 @@ python run_e2e.py
 ```
 
 Guarda resultados en `data/e2e_results/` (`documento_1.json`, `documento_2.json`, `documento_3.json`, `summary.json`).
-
-### Verificación local con mocks (sin API)
-
-```bash
-python verify_pipeline.py
-```
 
 ## Ejemplo de salida
 

@@ -66,6 +66,11 @@ def run_pipeline(original_path: str, amendment_path: str) -> ContractChangeOutpu
             )
             print(f"Original contract successfully transcribed ({len(original_text)} chars).")
 
+            print("--------------------------------")
+            print("Original contract text:")
+            print(original_text)
+            print("--------------------------------")
+
             # Step 2: Parse Amendment Contract
             print(f"Step 2/4: Parsing amendment contract image: {amendment_path}...")
             amendment_text = parse_contract_image(

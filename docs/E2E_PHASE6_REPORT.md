@@ -62,7 +62,6 @@ Artefactos guardados en `data/e2e_results/`:
 | JSON con `sections_changed`, `topics_touched`, `summary_of_the_change` | Cumplido |
 | Sin OCR tradicional (solo GPT-4o visión) | Cumplido |
 | `langfuse.flush()` al finalizar | Cumplido |
-| Test de orquestación con mocks (`verify_pipeline.py`) | Cumplido |
 
 ## Pendiente manual (Fase 5 — auditoría Langfuse UI)
 
