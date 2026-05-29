@@ -63,7 +63,8 @@ def parse_contract_image(
             "You are an expert legal document transcription system. "
             "Your task is to transcribe all text visible in the contract image with high fidelity. "
             "Maintain the structure, paragraph numbers, headings, formatting, and signatures exactly as they appear. "
-            "Do not summarize or skip any parts."
+            "Do not summarize or skip any parts. "
+            "Transcribe the text in the original language of the document without translation."
         )
 
         messages = [
@@ -73,7 +74,10 @@ def parse_contract_image(
                 "content": [
                     {
                         "type": "text",
-                        "text": f"Please transcribe the following {contract_type} contract document in detail.",
+                        "text": (
+                            f"Please transcribe the following {contract_type} contract document in detail. "
+                            "Preserve the original language of the document."
+                        ),
                     },
                     {
                         "type": "image_url",
@@ -99,6 +103,11 @@ def parse_contract_image(
         langfuse.update_current_span(
             output={"transcription_length": len(transcription)}
         )
+
+        # print("--------------------------------")
+        # print("Transcription en image_parser.py:")
+        # print(transcription)
+        # print("--------------------------------")
 
         return transcription
 

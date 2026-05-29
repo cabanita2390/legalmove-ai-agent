@@ -44,21 +44,20 @@ class ExtractionAgent:
         )
 
         system_prompt = (
-            "Eres un experto en análisis de contratos legales. Tu tarea es extraer la lista exacta de "
-            "cláusulas modificadas, agregadas o eliminadas, los temas legales/comerciales afectados y un "
-            "resumen detallado de los cambios.\n"
-            "Utiliza el Contrato Original, la Enmienda y el Mapa de Alineación Contextual proporcionados.\n"
-            "Debes cumplir estrictamente con el esquema de salida solicitado.\n"
-            "IMPORTANTE: Responde SIEMPRE en español. Todos los valores de texto del JSON "
-            "(sections_changed, topics_touched, summary_of_the_change) deben estar redactados en español, "
-            "incluso si el contrato fuente contiene términos en otro idioma."
+            "You are an expert legal contract analysis agent. Your task is to extract the exact list of "
+            "modified, added, or deleted clauses, the affected legal/commercial topics, and a detailed "
+            "summary of the changes.\n"
+            "Use the Original Contract, Amendment, and Contextual Alignment Map provided.\n"
+            "You must strictly comply with the requested output schema.\n"
+            "IMPORTANT: Write ALL text field values in Spanish (sections_changed, topics_touched, "
+            "summary_of_the_change), even if the source contract contains terms in another language."
         )
 
         user_content = (
-            f"### CONTRATO ORIGINAL:\n{original_text}\n\n"
-            f"### ENMIENDA:\n{amendment_text}\n\n"
-            f"### MAPA DE ALINEACIÓN CONTEXTUAL:\n{alignment_map}\n\n"
-            "Extrae los cambios según el esquema indicado. Redacta toda la salida en español."
+            f"### ORIGINAL CONTRACT:\n{original_text}\n\n"
+            f"### AMENDMENT:\n{amendment_text}\n\n"
+            f"### CONTEXTUAL ALIGNMENT MAP:\n{alignment_map}\n\n"
+            "Extract the changes according to the schema. Write all output text in Spanish."
         )
 
         messages = [

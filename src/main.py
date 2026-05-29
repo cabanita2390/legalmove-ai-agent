@@ -37,6 +37,7 @@ def run_pipeline(original_path: str, amendment_path: str) -> ContractChangeOutpu
     All steps are tracked in Langfuse under a single hierarchical trace
     using the @observe decorator (Langfuse Python SDK v4 best practices).
     """
+
     # Propagate user_id and metadata to the current trace and all children
     with propagate_attributes(
         user_id="legalmove-user-1",
@@ -66,10 +67,10 @@ def run_pipeline(original_path: str, amendment_path: str) -> ContractChangeOutpu
             )
             print(f"Original contract successfully transcribed ({len(original_text)} chars).")
 
-            print("--------------------------------")
-            print("Original contract text:")
-            print(original_text)
-            print("--------------------------------")
+            # print("--------------------------------")
+            # print("Original contract text:")
+            # print(original_text)
+            # print("--------------------------------")
 
             # Step 2: Parse Amendment Contract
             print(f"Step 2/4: Parsing amendment contract image: {amendment_path}...")
@@ -79,6 +80,11 @@ def run_pipeline(original_path: str, amendment_path: str) -> ContractChangeOutpu
                 openai_client=openai_client,
             )
             print(f"Amendment contract successfully transcribed ({len(amendment_text)} chars).")
+
+            # print("--------------------------------")
+            # print("Amendment contract text:")
+            # print(amendment_text)
+            # print("--------------------------------")
 
             # Step 3: Contextual Clause Alignment
             print("Step 3/4: Generating contextual clause alignment map...")

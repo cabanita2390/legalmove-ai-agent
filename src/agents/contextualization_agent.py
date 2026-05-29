@@ -43,13 +43,15 @@ class ContextualizationAgent:
             "2. The nature of the change (e.g., Modification, Deletion, Addition, Clarification).\n"
             "3. A comparison of the old provision vs. the new provision.\n\n"
             "Format your output as a clean, highly structured Markdown report containing a summary "
-            "and a clause alignment table."
+            "and a clause alignment table.\n"
+            "IMPORTANT: Write the entire report in Spanish, including headings, labels, change types, "
+            "and all descriptive text."
         )
 
         user_content = (
             f"### ORIGINAL CONTRACT:\n{original_text}\n\n"
             f"### AMENDMENT:\n{amendment_text}\n\n"
-            "Please generate the Contextual Alignment Map."
+            "Please generate the Contextual Alignment Map. Write all output text in Spanish."
         )
 
         messages = [
