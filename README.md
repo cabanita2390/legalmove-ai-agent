@@ -65,10 +65,12 @@ Las llamadas a OpenAI se registran como generaciones anidadas (tokens, latencia,
 │   └── e2e_results/         # Salidas JSON de pruebas E2E
 ├── docs/
 │   └── E2E_PHASE6_REPORT.md
+├── frontend/                  # SPA React + Vite + Tailwind
 ├── src/
 │   ├── agents/
 │   │   ├── contextualization_agent.py
 │   │   └── extraction_agent.py
+│   ├── api.py                 # API REST (FastAPI)
 │   ├── image_parser.py
 │   ├── models.py
 │   └── main.py
@@ -81,6 +83,7 @@ Las llamadas a OpenAI se registran como generaciones anidadas (tokens, latencia,
 ## Requisitos previos
 
 - Python 3.11+
+- Node.js 18+ (solo para la interfaz web)
 - Cuenta en [OpenAI](https://platform.openai.com/)
 - Proyecto en [Langfuse Cloud](https://cloud.langfuse.com)
 
@@ -138,6 +141,47 @@ python run_e2e.py
 ```
 
 Guarda resultados en `data/e2e_results/` (`documento_1.json`, `documento_2.json`, `documento_3.json`, `summary.json`).
+
+## Interfaz web
+
+La interfaz explica el sistema, permite cargar el **contrato original** y la **enmienda** por separado, y muestra el reporte estructurado.
+
+### Desarrollo (dos terminales)
+
+**Terminal 1 — API (backend):**
+
+```bash
+uvicorn src.api:app --reload --port 8000
+```
+
+**Terminal 2 — Frontend (Vite con proxy a `/api`):**
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Abre [http://localhost:5173](http://localhost:5173). Las peticiones a `/api/*` se redirigen al backend en el puerto 8000.
+
+### Producción (un solo servidor)
+
+```bash
+cd frontend
+npm install
+npm run build
+cd ..
+uvicorn src.api:app --host 0.0.0.0 --port 8000
+```
+
+Abre [http://localhost:8000](http://localhost:8000). FastAPI sirve el build de React y expone `POST /api/analyze`.
+
+### Endpoints de la API
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `GET` | `/api/health` | Estado del servicio |
+| `POST` | `/api/analyze` | Análisis (multipart: `original`, `amendment`) |
 
 ## Ejemplo de salida
 

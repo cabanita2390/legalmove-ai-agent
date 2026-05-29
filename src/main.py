@@ -24,6 +24,17 @@ from src.models import ContractChangeOutput
 langfuse = Langfuse()
 
 
+def validate_environment(*, raise_on_missing_openai: bool = False) -> None:
+    """Validates required environment variables for pipeline execution."""
+    if not os.environ.get("OPENAI_API_KEY"):
+        if raise_on_missing_openai:
+            raise RuntimeError("Missing OPENAI_API_KEY environment variable.")
+        print("[ERROR] Missing OPENAI_API_KEY environment variable.", file=sys.stderr)
+        sys.exit(1)
+    if not os.environ.get("LANGFUSE_PUBLIC_KEY") or not os.environ.get("LANGFUSE_SECRET_KEY"):
+        print("[WARNING] Langfuse keys not found. Tracing may be disabled.")
+
+
 @observe(name="contract-analysis")
 def run_pipeline(original_path: str, amendment_path: str) -> ContractChangeOutput:
     """
@@ -138,12 +149,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # Validate environment
-    if not os.environ.get("OPENAI_API_KEY"):
-        print("[ERROR] Missing OPENAI_API_KEY environment variable.", file=sys.stderr)
-        sys.exit(1)
-    if not os.environ.get("LANGFUSE_PUBLIC_KEY") or not os.environ.get("LANGFUSE_SECRET_KEY"):
-        print("[WARNING] Langfuse keys not found. Tracing may be disabled.")
+    validate_environment()
 
     try:
         results = run_pipeline(args.original, args.amendment)
