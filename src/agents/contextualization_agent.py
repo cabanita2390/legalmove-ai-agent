@@ -1,5 +1,7 @@
 from langfuse import observe, Langfuse
 from langfuse.openai import OpenAI
+import openai
+from pydantic import ValidationError
 
 # Langfuse singleton client for dynamic span updates
 langfuse = Langfuse()
@@ -8,8 +10,8 @@ langfuse = Langfuse()
 class ContextualizationAgent:
     """
     Agent responsible for structural alignment of the original contract and the amendment.
-    Identifies which sections of the original contract are modified, added, or deleted
-    by the amendment, creating a contextual alignment map.
+    Builds a navigable contextual map (section IDs, cross-references, structural change types)
+    without listing or summarizing commercial or legal modifications.
     """
 
     def __init__(self, openai_client: OpenAI = None):
@@ -36,22 +38,31 @@ class ContextualizationAgent:
         )
 
         system_prompt = (
-            "You are an expert contract analysis agent. Your goal is to construct a detailed "
-            "structural alignment map (Contextual Map) between an original contract and its amendment.\n\n"
-            "Review the texts carefully and identify:\n"
-            "1. Which clauses, sections, or paragraph numbers of the original contract are referenced or changed by the amendment.\n"
-            "2. The nature of the change (e.g., Modification, Deletion, Addition, Clarification).\n"
-            "3. A comparison of the old provision vs. the new provision.\n\n"
-            "Format your output as a clean, highly structured Markdown report containing a summary "
-            "and a clause alignment table.\n"
-            "IMPORTANT: Write the entire report in Spanish, including headings, labels, change types, "
-            "and all descriptive text."
+            "You are an expert contract structural analysis agent. Your ONLY responsibility is to "
+            "construct a structural alignment map (Contextual Map) between an original contract and its amendment.\n\n"
+            "Your job is to STRUCTURE and NAVIGATE the documents — not to analyze or summarize their commercial content.\n\n"
+            "Review the texts and produce:\n"
+            "1. Which clauses, sections, or paragraph numbers of the original contract are referenced, "
+            "touched, or affected by the amendment.\n"
+            "2. The structural type of each link (Modification, Deletion, Addition, Clarification) — label only, "
+            "no content analysis.\n"
+            "3. Cross-references between amendment passages and original contract locations.\n\n"
+            "STRICT PROHIBITIONS — do NOT:\n"
+            "- List, describe, or summarize commercial or legal modifications (e.g., price changes, penalty terms, "
+            "new obligations).\n"
+            "- Compare or quote the old provision vs. the new provision.\n"
+            "- Include amounts, dates, percentages, or any substantive before/after content.\n"
+            "- Write executive summaries of what changed in business terms.\n\n"
+            "Format your output as clean Markdown with a clause alignment table "
+            "(section ID, structural change type, cross-reference).\n"
+            "IMPORTANT: Write the entire report in Spanish, including headings, labels, and change types."
         )
 
         user_content = (
             f"### ORIGINAL CONTRACT:\n{original_text}\n\n"
             f"### AMENDMENT:\n{amendment_text}\n\n"
-            "Please generate the Contextual Alignment Map. Write all output text in Spanish."
+            "Generate the structural Contextual Alignment Map only. Do not summarize commercial modifications. "
+            "Write all output text in Spanish."
         )
 
         messages = [
@@ -60,12 +71,16 @@ class ContextualizationAgent:
         ]
 
         # OpenAI call is auto-traced as a generation via langfuse.openai wrapper
-        response = self.client.chat.completions.create(
-            model="gpt-4o",
-            messages=messages,
-            temperature=0.1,
-            name="contextualization-gpt-4o",
-        )
+        try:
+            response = self.client.chat.completions.create(
+                model="gpt-4o",
+                messages=messages,
+                temperature=0.0,
+                name="gpt-4o-vision-transcription",
+            )
+        except (openai.RateLimitError, openai.APIError, openai.TimeoutError, ValidationError) as e:
+            langfuse.update_current_span(error=str(e))
+            raise
 
         alignment_map = response.choices[0].message.content
 

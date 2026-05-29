@@ -1,7 +1,8 @@
 from langfuse import observe, Langfuse
 from langfuse.openai import OpenAI
 from src.models import ContractChangeOutput
-
+import openai
+from pydantic import ValidationError
 # Langfuse singleton client for dynamic span updates
 langfuse = Langfuse()
 
@@ -9,8 +10,8 @@ langfuse = Langfuse()
 class ExtractionAgent:
     """
     Agent responsible for extracting structured change data using OpenAI Structured Outputs.
-    Compares the original contract and the amendment with help from the alignment map
-    and outputs a structured ContractChangeOutput Pydantic object.
+    Uses the contextual alignment map as a navigation rule to locate sections, then extracts
+    quantitative and qualitative alterations into a ContractChangeOutput Pydantic object.
     """
 
     def __init__(self, openai_client: OpenAI = None):
@@ -44,10 +45,19 @@ class ExtractionAgent:
         )
 
         system_prompt = (
-            "You are an expert legal contract analysis agent. Your task is to extract the exact list of "
-            "modified, added, or deleted clauses, the affected legal/commercial topics, and a detailed "
-            "summary of the changes.\n"
-            "Use the Original Contract, Amendment, and Contextual Alignment Map provided.\n"
+            "You are an expert legal contract extraction agent. Your ONLY responsibility is to identify "
+            "quantitative and qualitative alterations introduced by the amendment.\n\n"
+            "Use the Contextual Alignment Map as your NAVIGATION RULE: it tells you WHICH sections and "
+            "clauses to inspect. Do not re-derive structure from scratch — follow the map first, then "
+            "read the Original Contract and Amendment at each mapped location to extract substance.\n\n"
+            "For each mapped section, extract:\n"
+            "- Quantitative alterations: amounts, deadlines, percentages, durations, quantities, numeric thresholds.\n"
+            "- Qualitative alterations: new/removed/modified obligations, rights, conditions, scope, or "
+            "legal/commercial terms.\n\n"
+            "Populate the output schema with:\n"
+            "- sections_changed: affected clause/section identifiers from the map\n"
+            "- topics_touched: legal/commercial categories impacted (e.g., Penalidades, Vigencia, Precio)\n"
+            "- summary_of_the_change: clear executive description of the substantive alterations found\n\n"
             "You must strictly comply with the requested output schema.\n"
             "IMPORTANT: Write ALL text field values in Spanish (sections_changed, topics_touched, "
             "summary_of_the_change), even if the source contract contains terms in another language."
@@ -57,7 +67,8 @@ class ExtractionAgent:
             f"### ORIGINAL CONTRACT:\n{original_text}\n\n"
             f"### AMENDMENT:\n{amendment_text}\n\n"
             f"### CONTEXTUAL ALIGNMENT MAP:\n{alignment_map}\n\n"
-            "Extract the changes according to the schema. Write all output text in Spanish."
+            "Use the Contextual Alignment Map as your navigation guide. Extract quantitative and qualitative "
+            "alterations at each mapped location according to the schema. Write all output text in Spanish."
         )
 
         messages = [
@@ -65,21 +76,38 @@ class ExtractionAgent:
             {"role": "user", "content": user_content},
         ]
 
-        # Call OpenAI with Structured Outputs — auto-traced via langfuse.openai wrapper
-        response = self.client.beta.chat.completions.parse(
-            model="gpt-4o",
-            messages=messages,
-            response_format=ContractChangeOutput,
-            temperature=0.0,
-            name="extraction-gpt-4o",
-        )
+        try:
+            # Call OpenAI with Structured Outputs — auto-traced via langfuse.openai wrapper
+            response = self.client.beta.chat.completions.parse(
+                model="gpt-4o",
+                messages=messages,
+                response_format=ContractChangeOutput,
+                temperature=0.0,
+                name="extraction-gpt-4o",
+            )
 
-        parsed_output = response.choices[0].message.parsed
+            parsed_output = response.choices[0].message.parsed
 
-        if parsed_output is None:
-            raise ValueError("Failed to parse the structured output from OpenAI.")
+            if parsed_output is None:
+                raise ValueError("Failed to parse the structured output from OpenAI.")
+        except openai.RateLimitError as e:
+            # Log rate limit specific error
+            langfuse.update_current_span(error=str(e))
+            raise
+        except openai.APIError as e:
+            # Log generic API errors (including authentication, server errors)
+            langfuse.update_current_span(error=str(e))
+            raise
+        except openai.TimeoutError as e:
+            # Log timeout errors
+            langfuse.update_current_span(error=str(e))
+            raise
+        except ValidationError as e:
+            # Log Pydantic validation errors for malformed JSON
+            langfuse.update_current_span(error=str(e))
+            raise
 
-        # Update span output
+        # Update span output after successful parsing
         langfuse.update_current_span(output=parsed_output.model_dump())
 
         return parsed_output

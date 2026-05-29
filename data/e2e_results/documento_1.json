@@ -9,11 +9,11 @@
   ],
   "topics_touched": [
     "Licencia",
-    "Duración del Contrato",
-    "Pago",
+    "Vigencia",
+    "Precio",
     "Soporte Técnico",
-    "Terminación del Contrato",
+    "Terminación",
     "Protección de Datos"
   ],
-  "summary_of_the_change": "La enmienda al contrato de licencia de software introduce varias modificaciones clave: 1) La cláusula de otorgamiento de licencia se modifica eliminando la palabra 'intransferible' y cambiando 'fines internos de la empresa' a 'operaciones internas de negocio'. 2) La duración del contrato se extiende de 12 a 24 meses. 3) La tarifa anual de licencia aumenta de USD 12,000 a USD 15,000. 4) El soporte técnico se amplía para incluir chat además de correo electrónico. 5) El período de notificación para la terminación del contrato se extiende de 30 a 60 días. 6) Se añade una nueva cláusula sobre protección de datos, comprometiendo al Licenciante a cumplir con las normativas aplicables en esta materia."
+  "summary_of_the_change": "Se realizaron varias modificaciones al contrato original: \n1. En la sección de Otorgamiento de Licencia, se amplió el uso del software para incluir operaciones internas de negocio, eliminando la restricción de uso exclusivo para fines internos de la empresa.\n2. El plazo del contrato se extendió de 12 a 24 meses.\n3. La tarifa anual de licencia aumentó de USD 12.000 a USD 15.000.\n4. Se añadió soporte técnico vía chat además del soporte por correo electrónico.\n5. El periodo de notificación para la terminación del contrato se extendió de 30 a 60 días.\n6. Se añadió una nueva sección sobre Protección de Datos, comprometiendo al Licenciante a cumplir con las normativas aplicables en esta materia."
 }
